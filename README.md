@@ -4,7 +4,7 @@
 Тестировалось с Steam Flatpak. Инструкция по установке взята с https://github.com/GloriousEggroll/proton-ge-custom.
 
 
-Учитывается что корневой каталог:
+Учитывается что корневой каталог Steam:
 
 Steam Native: "/home/USER/.steam/root/"
 
