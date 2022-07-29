@@ -11,6 +11,6 @@ Steam Native: "/home/USER/.steam/root/"
 Steam Flatpak: "/home/USER/.var/app/com.valvesoftware.Steam/data/Steam/"
 
 
-#Dependecies:
+# Dependecies:
 1. xz-utilz
 2. tar
