@@ -11,6 +11,8 @@ import (
 	"os/user"
 	"regexp"
 	"strings"
+
+	"github.com/schollz/progressbar/v3"
 )
 
 func main() {
@@ -86,19 +88,22 @@ func downloadFile(archiveProton string, gitProtonLink string) {
 	protonVersion := strings.SplitN(archiveProton, ".", 2)[0]
 	fmt.Printf("Загрузка %s... Подождите...\n", protonVersion)
 	protonURL := fmt.Sprintf("%s/download/%s/%s", gitProtonLink, protonVersion, archiveProton)
-	download, err := http.Get(protonURL)
+
+	req, _ := http.NewRequest("GET", protonURL, nil)
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		log.Println(err)
 	}
-	defer download.Body.Close()
+	defer resp.Body.Close()
 
-	out, err := os.Create(archiveProton)
-	if err != nil {
-		log.Println(err)
-	}
-	defer out.Close()
+	f, _ := os.OpenFile(archiveProton, os.O_CREATE|os.O_WRONLY, 0644)
+	defer f.Close()
 
-	_, err = io.Copy(out, download.Body)
+	bar := progressbar.DefaultBytes(
+		resp.ContentLength,
+		"",
+	)
+	io.Copy(io.MultiWriter(f, bar), resp.Body)
 }
 
 func Uncompress(protonRelease string, dir string) {
