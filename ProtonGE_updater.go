@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -21,7 +20,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	gitProtonLink := fmt.Sprintf("https://github.com/GloriousEggroll/proton-ge-custom/releases")
+	gitProtonLink := "https://github.com/GloriousEggroll/proton-ge-custom/releases"
 	nativeSteamPath := fmt.Sprintf("/home/%s/.steam/root/", user.Username)
 	flatpakSteamPaths := fmt.Sprintf("/home/%s/.var/app/com.valvesoftware.Steam/data/Steam/", user.Username)
 
@@ -55,21 +54,15 @@ func parcingProtonName(gitProtonLink string) string {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer resp.Body.Close()
+	// defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	re := regexp.MustCompile("GE-Proton[0-9]-[0-9]{2}.tar.gz")
-	matched := re.MatchString(string(body))
-	if matched == false {
-		re = regexp.MustCompile("GE-Proton[0-9]{2}-[0-9]{2}.tar.gz")
-		matched = re.MatchString(string(body))
-	}
-
-	return re.FindString(string(body))
+	re := regexp.MustCompile(`GE-Proton[\d]-[\d]*`)
+	protonName := re.FindString(string(body))
+	return fmt.Sprintf("%s.tar.gz", protonName)
 }
 
 func checkProtonInstall(archiveProton string, dir string) {
