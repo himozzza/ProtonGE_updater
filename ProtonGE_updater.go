@@ -54,13 +54,13 @@ func parcingProtonName(gitProtonLink string) string {
 	if err != nil {
 		log.Fatal(err)
 	}
-	// defer resp.Body.Close()
+	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Fatal(err)
 	}
-	re := regexp.MustCompile(`GE-Proton[\d]-[\d]*`)
+	re := regexp.MustCompile(`GE-Proton[\d]*-[\d]*`)
 	protonName := re.FindString(string(body))
 	return fmt.Sprintf("%s.tar.gz", protonName)
 }
@@ -70,7 +70,12 @@ func checkProtonInstall(archiveProton string, dir string) {
 	dirsectories, _ := os.ReadDir(dir)
 
 	for _, dirs := range dirsectories {
-		if strings.Contains(protonVersion, dirs.Name()) {
+		if len(os.Args) > 1 {
+			if os.Args[1] == "-f" {
+				fmt.Printf("\nДанная версия Proton уже установлена. (%s)\nИспользуется флаг -f, заменяем установленную версию.\n\n", protonVersion)
+				os.Remove(dir + "/" + protonVersion)
+			}
+		} else if strings.Contains(protonVersion, dirs.Name()) {
 			fmt.Printf("\nДанная версия Proton уже установлена. (%s)\n\n", protonVersion)
 			os.Exit(0)
 		}
